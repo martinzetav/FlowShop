@@ -1,0 +1,17 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${GIT_REPO_URI}
+          username: ${GIT_USERNAME}
+          password: ${GIT_ACCESS_TOKEN}
+
+eureka:
+  instance:
+    hostname: localhost
