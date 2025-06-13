@@ -1,0 +1,36 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: msvc-product
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-server
+  config:
+    import: "optional:configserver:"
+
+
+# esto va en el repo
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: msvc-product
+    description: microservicio de ejemplo
+    version: 1.0.0
+
+eureka:
+  instance:
+    statusPageUrlPath: http://localhost:8090/actuator/info
+    healthCheckUrlPath: http://localhost:8090/actuator/health
+    hostname: localhost
