@@ -1,6 +1,7 @@
 package com.microservice.checkout.controller;
 
 import com.microservice.checkout.dto.CartDTO;
+import com.microservice.checkout.exception.ResourceAlreadyExistsException;
 import com.microservice.checkout.exception.ResourceNotFoundException;
 import com.microservice.checkout.model.Cart;
 import com.microservice.checkout.model.CartItem;
@@ -19,6 +20,7 @@ public class CartController {
 
     private final ICartService cartService;
 
+    // Crea un carrito por primera vez con o sin productos.
     @PostMapping
     public ResponseEntity<CartDTO> save(@RequestBody Cart cart){
         return ResponseEntity.status(HttpStatus.CREATED).body(cartService.save(cart));
@@ -45,9 +47,17 @@ public class CartController {
         return ResponseEntity.ok("Cart with id " + id + " successfully removed.");
     }
 
+    // Agrega un nuevo item al carrito
     @PostMapping("/{id}/items")
-    public ResponseEntity<CartDTO> addItemToCart(@PathVariable Long id, @RequestBody CartItem cartItem) throws ResourceNotFoundException {
-        return ResponseEntity.ok(cartService.addOrUpdateItem(id, cartItem));
+    public ResponseEntity<CartDTO> addItemToCart(@PathVariable Long id, @RequestBody CartItem cartItem) throws ResourceNotFoundException, ResourceAlreadyExistsException {
+        return ResponseEntity.ok(cartService.addItemToCart(id, cartItem));
+    }
+
+    // Actualiza un item determinado
+    @PutMapping("/{cartId}/items/{itemId}")
+    public ResponseEntity<CartDTO> updateItem(@PathVariable Long cartId, @PathVariable Long itemId,
+                                              @RequestBody CartItem updatedItem) throws ResourceNotFoundException {
+        return ResponseEntity.ok(cartService.updateItem(cartId, itemId, updatedItem));
     }
 
 
