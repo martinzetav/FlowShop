@@ -1,6 +1,7 @@
 package com.microservice.checkout.service.impl;
 
 import com.microservice.checkout.dto.CartDTO;
+import com.microservice.checkout.exception.ResourceAlreadyExistsException;
 import com.microservice.checkout.exception.ResourceNotFoundException;
 import com.microservice.checkout.mapper.CartMapper;
 import com.microservice.checkout.model.Cart;
@@ -58,7 +59,7 @@ public class CartService implements ICartService {
         }
     }
 
-    public CartDTO addOrUpdateItem(Long cartId, CartItem newItem) throws ResourceNotFoundException {
+    public CartDTO addItemToCart(Long cartId, CartItem newItem) throws ResourceNotFoundException, ResourceAlreadyExistsException {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
 
@@ -68,12 +69,27 @@ public class CartService implements ICartService {
                 .filter(item -> item.getProductId().equals(newItem.getProductId()))
                 .findFirst();
 
-        if (existingItemOpt.isPresent()) {
-            CartItem existingItem = existingItemOpt.get();
-            existingItem.setQuantity(newItem.getQuantity());
-        } else {
-            items.add(newItem);
+        if(existingItemOpt.isPresent()){
+            throw new ResourceAlreadyExistsException("Product already exists in cart.");
         }
+
+        items.add(newItem);
+        Cart cartWithNewItem = cartRepository.save(cart);
+        return cartMapper.toDto(cartWithNewItem);
+    }
+
+    public CartDTO updateItem(Long cartId, Long itemId, CartItem updatedItem) throws ResourceNotFoundException {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
+
+        List<CartItem> items = cart.getItems();
+
+        CartItem existingItem = items.stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Item with id " + itemId + " not found in cart."));
+
+        existingItem.setQuantity(updatedItem.getQuantity());
 
         Cart updatedCart = cartRepository.save(cart);
         return cartMapper.toDto(updatedCart);
