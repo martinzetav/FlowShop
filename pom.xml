@@ -22,6 +22,7 @@
     <module>microservice-product</module>
     <module>microservice-config</module>
     <module>microservice-checkout</module>
+    <module>microservice-order</module>
   </modules>
 
   <properties>
