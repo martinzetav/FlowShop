@@ -1,1 +1,17 @@
-spring.application.name=microservice-order
+server:
+  port: 8092
+
+spring:
+  application:
+    name: msvc-order
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-server
+  config:
+    import: "optional:configserver:"
+
+eureka:
+  instance:
+    hostname: localhost
