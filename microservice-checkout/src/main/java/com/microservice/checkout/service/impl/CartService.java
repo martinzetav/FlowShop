@@ -1,10 +1,13 @@
 package com.microservice.checkout.service.impl;
 
-import com.microservice.checkout.dto.CartDTO;
+import com.microservice.checkout.dto.request.CartItemRequestDTO;
+import com.microservice.checkout.dto.request.CartRequestDTO;
+import com.microservice.checkout.dto.response.CartResponseDTO;
 import com.microservice.checkout.dto.ProductDTO;
 import com.microservice.checkout.exception.InsufficientStockException;
 import com.microservice.checkout.exception.ResourceAlreadyExistsException;
 import com.microservice.checkout.exception.ResourceNotFoundException;
+import com.microservice.checkout.mapper.CartItemMapper;
 import com.microservice.checkout.mapper.CartMapper;
 import com.microservice.checkout.model.Cart;
 import com.microservice.checkout.model.CartItem;
@@ -22,80 +25,82 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CartService implements ICartService {
 
-    private final ICartRepository cartRepository;
     private final CartMapper cartMapper;
+    private final CartItemMapper cartItemMapper;
+    private final ICartRepository cartRepository;
     private final IProductService productService;
 
     @Override
-    public CartDTO save(Cart cart) {
-        // agregar validacion mediante USER_ID
+    public CartResponseDTO save(CartRequestDTO cartRequestDTO) {
+        // agregar validacion mediante USER_ID y verificar si tiene cart
+        Cart cart = cartMapper.toEntity(cartRequestDTO);
         Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toDto(savedCart);
+        return cartMapper.toResponseDto(savedCart);
     }
 
     @Override
-    public List<CartDTO> findAll() {
+    public List<CartResponseDTO> findAll() {
         List<Cart> carts = cartRepository.findAll();
         return carts.stream()
-                .map(cartMapper::toDto)
+                .map(cartMapper::toResponseDto)
                 .toList();
     }
 
     @Override
-    public CartDTO findById(Long id) throws ResourceNotFoundException {
+    public CartResponseDTO findById(Long id) {
         Optional<Cart> cart = cartRepository.findById(id);
         if(cart.isPresent()){
-            return cartMapper.toDto(cart.get());
+            return cartMapper.toResponseDto(cart.get());
         } else {
             throw new ResourceNotFoundException("Cart with id " + id + " not found.");
         }
     }
 
     @Override
-    public CartDTO update(Long id, Cart cart) throws ResourceNotFoundException {
-        Optional<Cart> wantedCart = cartRepository.findById(id);
-        if(wantedCart.isPresent()){
-            Cart updatedCart = wantedCart.get();
-            updatedCart.setUserId(cart.getUserId());
-            updatedCart.setItems(cart.getItems());
-            cartRepository.save(updatedCart);
-            return cartMapper.toDto(updatedCart);
-        } else {
-            throw new ResourceNotFoundException("Cart with id " + id + " not found.");
-        }
+    public CartResponseDTO update(Long id, CartRequestDTO cartRequestDTO) {
+        Cart existingCart = cartRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + id + " not found."));
+
+        Cart updatedCart = cartMapper.toEntity(cartRequestDTO);
+        updatedCart.setId(existingCart.getId());
+
+        cartRepository.save(updatedCart);
+
+        return cartMapper.toResponseDto(updatedCart);
     }
 
-    public CartDTO addItemToCart(Long cartId, CartItem newItem) throws ResourceNotFoundException, ResourceAlreadyExistsException {
+    public CartResponseDTO addItemToCart(Long cartId, CartItemRequestDTO newItem) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
 
         List<CartItem> items = cart.getItems();
 
-        Optional<CartItem> existingItemOpt = items.stream()
-                .filter(item -> item.getProductId().equals(newItem.getProductId()))
-                .findFirst();
+        boolean alreadyExists = items.stream()
+                .anyMatch(item -> item.getProductId().equals(newItem.productId()));
 
-        if(existingItemOpt.isPresent()){
+        if(alreadyExists){
             throw new ResourceAlreadyExistsException("Product already exists in cart.");
         }
 
         try{
-            ProductDTO product = productService.findById(newItem.getProductId());
+            ProductDTO product = productService.findById(newItem.productId());
 
-            if(newItem.getQuantity() > product.stock()){
+            if(newItem.quantity() > product.stock()){
                 throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
             }
 
         } catch (FeignException.NotFound e){
-            throw new ResourceNotFoundException("Product with id " + newItem.getProductId() + " not found.");
+            throw new ResourceNotFoundException("Product with id " + newItem.productId() + " not found.");
         }
 
-        items.add(newItem);
+        CartItem cartItem = cartItemMapper.toEntity(newItem);
+        items.add(cartItem);
+
         Cart cartWithNewItem = cartRepository.save(cart);
-        return cartMapper.toDto(cartWithNewItem);
+        return cartMapper.toResponseDto(cartWithNewItem);
     }
 
-    public CartDTO updateItem(Long cartId, Long itemId, CartItem updatedItem) throws ResourceNotFoundException {
+    public CartResponseDTO updateItem(Long cartId, Long itemId, CartItemRequestDTO updatedItem) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
 
@@ -109,18 +114,18 @@ public class CartService implements ICartService {
         try{
             ProductDTO product = productService.findById(existingItem.getProductId());
 
-            if(updatedItem.getQuantity() > product.stock()){
+            if(updatedItem.quantity() > product.stock()){
                 throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
             }
 
-            existingItem.setQuantity(updatedItem.getQuantity());
+            existingItem.setQuantity(updatedItem.quantity());
 
         } catch (FeignException.NotFound e){
             throw new ResourceNotFoundException("Product with id " + existingItem.getProductId() + " not found.");
         }
 
         Cart updatedCart = cartRepository.save(cart);
-        return cartMapper.toDto(updatedCart);
+        return cartMapper.toResponseDto(updatedCart);
     }
 
     @Override
