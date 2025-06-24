@@ -1,9 +1,9 @@
-package com.microservice.product.dto;
+package com.microservice.product.dto.response;
 
-public record ProductDTO(Long id,
-                         String name,
-                         String brand,
-                         String description,
-                         Double price,
-                         Integer stock) {
+public record ProductResponseDTO(Long id,
+                                 String name,
+                                 String brand,
+                                 String description,
+                                 Double price,
+                                 Integer stock) {
 }
