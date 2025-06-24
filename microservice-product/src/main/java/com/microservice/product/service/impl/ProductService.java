@@ -47,19 +47,16 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO) {
-        Optional<Product> wantedProduct = productRepository.findById(id);
-        if(wantedProduct.isPresent()){
-            Product updatedProduct = wantedProduct.get();
-            updatedProduct.setName(productRequestDTO.name());
-            updatedProduct.setBrand(productRequestDTO.brand());
-            updatedProduct.setDescription(productRequestDTO.description());
-            updatedProduct.setPrice(productRequestDTO.price());
-            updatedProduct.setStock(productRequestDTO.stock());
-            productRepository.save(updatedProduct);
-            return productMapper.toResponseDto(updatedProduct);
-        } else {
-            throw new ResourceNotFoundException("Product with id " + id + " not found.");
-        }
+        Product wantedProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found."));
+
+        Product updatedProduct = productMapper.toEntity(productRequestDTO);
+
+        updatedProduct.setId(wantedProduct.getId());
+
+        productRepository.save(updatedProduct);
+
+        return productMapper.toResponseDto(updatedProduct);
     }
 
     @Override
