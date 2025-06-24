@@ -1,6 +1,8 @@
 package com.microservice.checkout.controller;
 
-import com.microservice.checkout.dto.CartDTO;
+import com.microservice.checkout.dto.request.CartItemRequestDTO;
+import com.microservice.checkout.dto.request.CartRequestDTO;
+import com.microservice.checkout.dto.response.CartResponseDTO;
 import com.microservice.checkout.exception.ResourceAlreadyExistsException;
 import com.microservice.checkout.exception.ResourceNotFoundException;
 import com.microservice.checkout.model.Cart;
@@ -22,22 +24,22 @@ public class CartController {
 
     // Crea un carrito por primera vez con o sin productos.
     @PostMapping
-    public ResponseEntity<CartDTO> save(@RequestBody Cart cart){
+    public ResponseEntity<CartResponseDTO> save(@RequestBody CartRequestDTO cart){
         return ResponseEntity.status(HttpStatus.CREATED).body(cartService.save(cart));
     }
 
     @GetMapping
-    public ResponseEntity<List<CartDTO>> findAll(){
+    public ResponseEntity<List<CartResponseDTO>> findAll(){
         return ResponseEntity.ok(cartService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CartDTO> findById(@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<CartResponseDTO> findById(@PathVariable Long id) throws ResourceNotFoundException {
         return ResponseEntity.ok(cartService.findById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CartDTO> update(@PathVariable Long id, @RequestBody Cart cart) throws ResourceNotFoundException {
+    public ResponseEntity<CartResponseDTO> update(@PathVariable Long id, @RequestBody CartRequestDTO cart) {
         return ResponseEntity.ok(cartService.update(id, cart));
     }
 
@@ -49,14 +51,14 @@ public class CartController {
 
     // Agrega un nuevo item al carrito
     @PostMapping("/{id}/items")
-    public ResponseEntity<CartDTO> addItemToCart(@PathVariable Long id, @RequestBody CartItem cartItem) throws ResourceNotFoundException, ResourceAlreadyExistsException {
+    public ResponseEntity<CartResponseDTO> addItemToCart(@PathVariable Long id, @RequestBody CartItemRequestDTO cartItem) {
         return ResponseEntity.ok(cartService.addItemToCart(id, cartItem));
     }
 
     // Actualiza un item determinado
     @PutMapping("/{cartId}/items/{itemId}")
-    public ResponseEntity<CartDTO> updateItem(@PathVariable Long cartId, @PathVariable Long itemId,
-                                              @RequestBody CartItem updatedItem) throws ResourceNotFoundException {
+    public ResponseEntity<CartResponseDTO> updateItem(@PathVariable Long cartId, @PathVariable Long itemId,
+                                                      @RequestBody CartItemRequestDTO updatedItem) throws ResourceNotFoundException {
         return ResponseEntity.ok(cartService.updateItem(cartId, itemId, updatedItem));
     }
 
