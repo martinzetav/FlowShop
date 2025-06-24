@@ -17,4 +17,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> processResourceAlreadyExistsException(ResourceAlreadyExistsException e){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<String> processInsufficientStockException(InsufficientStockException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 }
