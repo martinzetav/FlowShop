@@ -1,16 +1,16 @@
 package com.microservice.product.service;
 
-import com.microservice.product.dto.ProductDTO;
+import com.microservice.product.dto.request.ProductRequestDTO;
+import com.microservice.product.dto.response.ProductResponseDTO;
 import com.microservice.product.exception.ResourceNotFoundException;
 import com.microservice.product.model.Product;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IProductService {
-    ProductDTO save(Product product);
-    List<ProductDTO> findAll();
-    ProductDTO findById(Long id) throws ResourceNotFoundException;
-    ProductDTO update(Long id, Product product) throws ResourceNotFoundException;
-    void delete(Long id) throws ResourceNotFoundException;
+    ProductResponseDTO save(ProductRequestDTO productRequestDTO);
+    List<ProductResponseDTO> findAll();
+    ProductResponseDTO findById(Long id);
+    ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO);
+    void delete(Long id);
 }

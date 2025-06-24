@@ -1,6 +1,7 @@
 package com.microservice.product.service.impl;
 
-import com.microservice.product.dto.ProductDTO;
+import com.microservice.product.dto.request.ProductRequestDTO;
+import com.microservice.product.dto.response.ProductResponseDTO;
 import com.microservice.product.exception.ResourceNotFoundException;
 import com.microservice.product.mapper.ProductMapper;
 import com.microservice.product.model.Product;
@@ -20,48 +21,49 @@ public class ProductService implements IProductService {
     private final ProductMapper productMapper;
 
     @Override
-    public ProductDTO save(Product product) {
+    public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
+        Product product = productMapper.toEntity(productRequestDTO);
         Product savedProduct = productRepository.save(product);
-        return productMapper.toDto(savedProduct);
+        return productMapper.toResponseDto(savedProduct);
     }
 
     @Override
-    public List<ProductDTO> findAll() {
+    public List<ProductResponseDTO> findAll() {
         List<Product> products = productRepository.findAll();
         return products.stream()
-                .map(productMapper::toDto)
+                .map(productMapper::toResponseDto)
                 .toList();
     }
 
     @Override
-    public ProductDTO findById(Long id) throws ResourceNotFoundException {
+    public ProductResponseDTO findById(Long id) {
         Optional<Product> product = productRepository.findById(id);
         if(product.isPresent()){
-            return productMapper.toDto(product.get());
+            return productMapper.toResponseDto(product.get());
         } else {
             throw new ResourceNotFoundException("Product with id " + id + " not found.");
         }
     }
 
     @Override
-    public ProductDTO update(Long id, Product product) throws ResourceNotFoundException {
+    public ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO) {
         Optional<Product> wantedProduct = productRepository.findById(id);
         if(wantedProduct.isPresent()){
             Product updatedProduct = wantedProduct.get();
-            updatedProduct.setName(product.getName());
-            updatedProduct.setBrand(product.getBrand());
-            updatedProduct.setDescription(product.getDescription());
-            updatedProduct.setPrice(product.getPrice());
-            updatedProduct.setStock(product.getStock());
+            updatedProduct.setName(productRequestDTO.name());
+            updatedProduct.setBrand(productRequestDTO.brand());
+            updatedProduct.setDescription(productRequestDTO.description());
+            updatedProduct.setPrice(productRequestDTO.price());
+            updatedProduct.setStock(productRequestDTO.stock());
             productRepository.save(updatedProduct);
-            return productMapper.toDto(updatedProduct);
+            return productMapper.toResponseDto(updatedProduct);
         } else {
             throw new ResourceNotFoundException("Product with id " + id + " not found.");
         }
     }
 
     @Override
-    public void delete(Long id) throws ResourceNotFoundException {
+    public void delete(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found."));
 

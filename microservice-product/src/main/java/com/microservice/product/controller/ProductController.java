@@ -1,6 +1,7 @@
 package com.microservice.product.controller;
 
-import com.microservice.product.dto.ProductDTO;
+import com.microservice.product.dto.request.ProductRequestDTO;
+import com.microservice.product.dto.response.ProductResponseDTO;
 import com.microservice.product.exception.ResourceNotFoundException;
 import com.microservice.product.model.Product;
 import com.microservice.product.service.IProductService;
@@ -19,27 +20,27 @@ public class ProductController {
     private final IProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductDTO> save(@RequestBody Product product){
+    public ResponseEntity<ProductResponseDTO> save(@RequestBody ProductRequestDTO product){
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.save(product));
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> findAll(){
+    public ResponseEntity<List<ProductResponseDTO>> findAll(){
         return ResponseEntity.ok(productService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> findById(@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<ProductResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.findById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody Product product) throws ResourceNotFoundException {
+    public ResponseEntity<ProductResponseDTO> update(@PathVariable Long id, @RequestBody ProductRequestDTO product) throws ResourceNotFoundException {
         return ResponseEntity.ok(productService.update(id, product));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<String> delete(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.ok("Product with id " + id + " successfully removed.");
     }
