@@ -18,6 +18,8 @@ public class Cart {
     private Long id;
     @Column(name = "user_id")
     private Long userId;
+    @Enumerated(EnumType.STRING)
+    private CartStatus status;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
     private List<CartItem> items;
