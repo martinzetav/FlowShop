@@ -1,7 +1,6 @@
 package com.microservice.order.service;
 
 import com.microservice.order.dto.OrderDTO;
-import com.microservice.order.dto.request.OrderRequestDTO;
 import com.microservice.order.model.Order;
 
 import java.util.List;
@@ -13,5 +12,5 @@ public interface IOrderService {
     Optional<OrderDTO> findById(Long id);
     OrderDTO update(Long id, Order order);
     void delete(Long id);
-    OrderDTO createOrder(OrderRequestDTO orderRequestDTO);
+    OrderDTO createOrder(Long id);
 }

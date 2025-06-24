@@ -1,16 +1,19 @@
 package com.microservice.order.service.impl;
 
+import com.microservice.order.dto.CartDTO;
 import com.microservice.order.dto.OrderDTO;
 import com.microservice.order.dto.ProductDTO;
-import com.microservice.order.dto.request.OrderRequestDTO;
 import com.microservice.order.exception.InsufficientStockException;
+import com.microservice.order.exception.ResourceNotFoundException;
 import com.microservice.order.mapper.OrderMapper;
 import com.microservice.order.model.Order;
 import com.microservice.order.model.OrderStatus;
 import com.microservice.order.model.ProductOrder;
 import com.microservice.order.repository.IOrderRepository;
+import com.microservice.order.service.ICartService;
 import com.microservice.order.service.IOrderService;
 import com.microservice.order.service.IProductService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,7 @@ public class OrderService implements IOrderService {
     private final IOrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final IProductService productService;
+    private final ICartService cartService;
 
     @Override
     public OrderDTO save(Order order) {
@@ -56,16 +60,32 @@ public class OrderService implements IOrderService {
 
     }
 
-    @Override
-    public OrderDTO createOrder(OrderRequestDTO orderRequestDTO) {
+    public OrderDTO createOrder(Long id){
+        CartDTO cart;
+
+        try{
+            cart = cartService.findById(id);
+        } catch (FeignException.NotFound e){
+            throw new ResourceNotFoundException("Cart with id " + id + " not found.");
+        }
+
         List<ProductOrder> productOrders = new ArrayList<>();
 
-        orderRequestDTO.orders().forEach(item -> {
-            ProductDTO product = productService.findById(item.productId());
+        cart.items().forEach(item -> {
 
-            if(item.quantity() > product.stock()){
-                throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
+            ProductDTO product;
+
+            try {
+                product = productService.findById(item.productId());
+
+                if(item.quantity() > product.stock()){
+                    throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
+                }
+            } catch (FeignException.NotFound e) {
+                throw new ResourceNotFoundException("Product with id " + item.productId() + " not found.");
             }
+
+            // implementar para restar el stock del producto.
 
             ProductOrder productOrder = ProductOrder.builder()
                     .productId(product.id())
@@ -81,7 +101,7 @@ public class OrderService implements IOrderService {
                 .sum();
 
         Order order = Order.builder()
-                .userId(orderRequestDTO.userId())
+                .userId(cart.userId())
                 .date(LocalDateTime.now())
                 .status(OrderStatus.PENDING)
                 .orders(productOrders)
@@ -92,6 +112,6 @@ public class OrderService implements IOrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return orderMapper.toDto(order);
+        return orderMapper.toDto(savedOrder);
     }
 }
