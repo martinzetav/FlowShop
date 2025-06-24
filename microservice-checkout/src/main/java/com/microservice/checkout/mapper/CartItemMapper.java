@@ -1,11 +1,12 @@
 package com.microservice.checkout.mapper;
 
-import com.microservice.checkout.dto.CartItemDTO;
+import com.microservice.checkout.dto.request.CartItemRequestDTO;
+import com.microservice.checkout.dto.response.CartItemResponseDTO;
 import com.microservice.checkout.model.CartItem;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface CartItemMapper {
-    CartItemDTO toDto(CartItem cartItem);
-    CartItem toEntity(CartItemDTO cartItemDTO);
+    CartItemResponseDTO toResponseDto(CartItem cartItem);
+    CartItem toEntity(CartItemRequestDTO cartItemRequestDTO);
 }
