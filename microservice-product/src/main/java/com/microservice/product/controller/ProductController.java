@@ -5,6 +5,7 @@ import com.microservice.product.dto.response.ProductResponseDTO;
 import com.microservice.product.exception.ResourceNotFoundException;
 import com.microservice.product.model.Product;
 import com.microservice.product.service.IProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class ProductController {
     private final IProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> save(@RequestBody ProductRequestDTO product){
+    public ResponseEntity<ProductResponseDTO> save(@RequestBody @Valid ProductRequestDTO product){
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.save(product));
     }
 
