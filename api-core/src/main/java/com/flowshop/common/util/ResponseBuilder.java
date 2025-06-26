@@ -1,7 +1,7 @@
-package com.microservice.product.util;
+package com.flowshop.common.util;
 
-import com.microservice.product.api.response.ApiErrorResponse;
-import com.microservice.product.api.response.ApiSuccessResponse;
+import com.flowshop.common.api.response.ApiErrorResponse;
+import com.flowshop.common.api.response.ApiSuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 

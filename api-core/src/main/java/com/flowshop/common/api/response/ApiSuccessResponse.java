@@ -1,4 +1,4 @@
-package com.microservice.product.api.response;
+package com.flowshop.common.api.response;
 
 public record ApiSuccessResponse<T>(
         int status,

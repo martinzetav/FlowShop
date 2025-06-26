@@ -1,4 +1,4 @@
-package com.microservice.product.api.response;
+package com.flowshop.common.api.response;
 
 import java.util.Map;
 

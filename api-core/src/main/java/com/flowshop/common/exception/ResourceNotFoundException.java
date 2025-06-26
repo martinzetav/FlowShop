@@ -1,4 +1,4 @@
-package com.microservice.product.exception;
+package com.flowshop.common.exception;
 
 public class ResourceNotFoundException extends RuntimeException{
     public ResourceNotFoundException(String message) {
