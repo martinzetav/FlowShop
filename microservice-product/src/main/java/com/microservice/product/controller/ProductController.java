@@ -1,10 +1,10 @@
 package com.microservice.product.controller;
 
-import com.microservice.product.api.response.ApiSuccessResponse;
+import com.flowshop.common.api.response.ApiSuccessResponse;
+import com.flowshop.common.util.ResponseBuilder;
 import com.microservice.product.dto.request.ProductRequestDTO;
 import com.microservice.product.dto.response.ProductResponseDTO;
 import com.microservice.product.service.IProductService;
-import com.microservice.product.util.ResponseBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ApiSuccessResponse<ProductResponseDTO>> save(@RequestBody @Valid ProductRequestDTO product,
-                                                   HttpServletRequest request){
+                                                                       HttpServletRequest request){
         ProductResponseDTO savedProduct = productService.save(product);
 
         ApiSuccessResponse<ProductResponseDTO> response = ResponseBuilder.buildSuccessResponse(

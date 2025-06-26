@@ -1,8 +1,8 @@
 package com.microservice.product.service.impl;
 
+import com.flowshop.common.exception.ResourceNotFoundException;
 import com.microservice.product.dto.request.ProductRequestDTO;
 import com.microservice.product.dto.response.ProductResponseDTO;
-import com.microservice.product.exception.ResourceNotFoundException;
 import com.microservice.product.mapper.ProductMapper;
 import com.microservice.product.model.Product;
 import com.microservice.product.repository.IProductRepository;

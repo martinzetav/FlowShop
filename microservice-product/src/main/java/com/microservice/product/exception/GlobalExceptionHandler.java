@@ -1,7 +1,8 @@
 package com.microservice.product.exception;
 
-import com.microservice.product.api.response.ApiErrorResponse;
-import com.microservice.product.util.ResponseBuilder;
+import com.flowshop.common.exception.ResourceNotFoundException;
+import com.flowshop.common.api.response.ApiErrorResponse;
+import com.flowshop.common.util.ResponseBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
