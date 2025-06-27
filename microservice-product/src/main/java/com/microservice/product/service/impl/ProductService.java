@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class ProductService implements IProductService {
     private final IProductRepository productRepository;
     private final ProductMapper productMapper;
 
+    @Transactional
     @Override
     public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
         Product product = productMapper.toEntity(productRequestDTO);
@@ -45,6 +47,7 @@ public class ProductService implements IProductService {
         }
     }
 
+    @Transactional
     @Override
     public ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO) {
         Product wantedProduct = productRepository.findById(id)
@@ -59,6 +62,7 @@ public class ProductService implements IProductService {
         return productMapper.toResponseDto(updatedProduct);
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         Product product = productRepository.findById(id)
