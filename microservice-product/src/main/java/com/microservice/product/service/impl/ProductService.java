@@ -8,6 +8,8 @@ import com.microservice.product.model.Product;
 import com.microservice.product.repository.IProductRepository;
 import com.microservice.product.service.IProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,11 +30,9 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> findAll() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(productMapper::toResponseDto)
-                .toList();
+    public Page<ProductResponseDTO> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable)
+                .map(productMapper::toResponseDto);
     }
 
     @Override

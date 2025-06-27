@@ -1,13 +1,19 @@
 package com.microservice.product.controller;
 
 import com.flowshop.common.api.response.ApiSuccessResponse;
+import com.flowshop.common.api.response.PageResponse;
 import com.flowshop.common.util.ResponseBuilder;
 import com.microservice.product.dto.request.ProductRequestDTO;
 import com.microservice.product.dto.response.ProductResponseDTO;
+import com.microservice.product.mapper.ProductMapper;
+import com.microservice.product.repository.IProductRepository;
 import com.microservice.product.service.IProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,15 +42,28 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiSuccessResponse<List<ProductResponseDTO>>> findAll(HttpServletRequest request){
-        List<ProductResponseDTO> products = productService.findAll();
-        ApiSuccessResponse<List<ProductResponseDTO>> response = ResponseBuilder.buildSuccessResponse(
+    public ResponseEntity<ApiSuccessResponse<PageResponse<ProductResponseDTO>>> findAll(@PageableDefault(size = 3, sort = {"name"}) Pageable pageable,
+                                                                                        HttpServletRequest request){
+        Page<ProductResponseDTO> page = productService.findAll(pageable);
+
+        PageResponse<ProductResponseDTO> pageResponse = new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast(),
+                page.getNumberOfElements()
+        );
+
+        ApiSuccessResponse<PageResponse<ProductResponseDTO>> response = ResponseBuilder.buildSuccessResponse(
                 HttpStatus.OK.value(),
                 "Products retrieved successfully",
-                products,
+                pageResponse,
                 request
         );
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
