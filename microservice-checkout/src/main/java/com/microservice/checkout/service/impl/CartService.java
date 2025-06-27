@@ -1,12 +1,12 @@
 package com.microservice.checkout.service.impl;
 
+import com.flowshop.common.exception.ResourceNotFoundException;
 import com.microservice.checkout.dto.request.CartItemRequestDTO;
 import com.microservice.checkout.dto.request.CartRequestDTO;
 import com.microservice.checkout.dto.response.CartResponseDTO;
 import com.microservice.checkout.dto.ProductDTO;
 import com.microservice.checkout.exception.InsufficientStockException;
 import com.microservice.checkout.exception.ResourceAlreadyExistsException;
-import com.microservice.checkout.exception.ResourceNotFoundException;
 import com.microservice.checkout.mapper.CartItemMapper;
 import com.microservice.checkout.mapper.CartMapper;
 import com.microservice.checkout.model.Cart;
@@ -129,7 +129,7 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public void delete(Long id) throws ResourceNotFoundException {
+    public void delete(Long id) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + id + " not found."));
 

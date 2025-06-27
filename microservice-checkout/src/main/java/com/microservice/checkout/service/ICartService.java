@@ -3,10 +3,6 @@ package com.microservice.checkout.service;
 import com.microservice.checkout.dto.request.CartItemRequestDTO;
 import com.microservice.checkout.dto.request.CartRequestDTO;
 import com.microservice.checkout.dto.response.CartResponseDTO;
-import com.microservice.checkout.exception.ResourceAlreadyExistsException;
-import com.microservice.checkout.exception.ResourceNotFoundException;
-import com.microservice.checkout.model.Cart;
-import com.microservice.checkout.model.CartItem;
 
 import java.util.List;
 
@@ -15,7 +11,7 @@ public interface ICartService{
     List<CartResponseDTO> findAll();
     CartResponseDTO findById(Long id);
     CartResponseDTO update(Long id, CartRequestDTO cartRequestDTO);
-    void delete(Long id) throws ResourceNotFoundException;
+    void delete(Long id);
     CartResponseDTO addItemToCart(Long cartId, CartItemRequestDTO newItem);
     CartResponseDTO updateItem(Long cartId, Long itemId, CartItemRequestDTO updatedItem);
 }

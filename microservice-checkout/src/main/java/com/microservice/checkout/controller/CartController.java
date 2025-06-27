@@ -3,11 +3,8 @@ package com.microservice.checkout.controller;
 import com.microservice.checkout.dto.request.CartItemRequestDTO;
 import com.microservice.checkout.dto.request.CartRequestDTO;
 import com.microservice.checkout.dto.response.CartResponseDTO;
-import com.microservice.checkout.exception.ResourceAlreadyExistsException;
-import com.microservice.checkout.exception.ResourceNotFoundException;
-import com.microservice.checkout.model.Cart;
-import com.microservice.checkout.model.CartItem;
 import com.microservice.checkout.service.ICartService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +21,7 @@ public class CartController {
 
     // Crea un carrito por primera vez con o sin productos.
     @PostMapping
-    public ResponseEntity<CartResponseDTO> save(@RequestBody CartRequestDTO cart){
+    public ResponseEntity<CartResponseDTO> save(@RequestBody @Valid CartRequestDTO cart){
         return ResponseEntity.status(HttpStatus.CREATED).body(cartService.save(cart));
     }
 
@@ -34,7 +31,7 @@ public class CartController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CartResponseDTO> findById(@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<CartResponseDTO> findById(@PathVariable Long id){
         return ResponseEntity.ok(cartService.findById(id));
     }
 
@@ -44,7 +41,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<String> delete(@PathVariable Long id){
         cartService.delete(id);
         return ResponseEntity.ok("Cart with id " + id + " successfully removed.");
     }
@@ -58,7 +55,7 @@ public class CartController {
     // Actualiza un item determinado
     @PutMapping("/{cartId}/items/{itemId}")
     public ResponseEntity<CartResponseDTO> updateItem(@PathVariable Long cartId, @PathVariable Long itemId,
-                                                      @RequestBody CartItemRequestDTO updatedItem) throws ResourceNotFoundException {
+                                                      @RequestBody CartItemRequestDTO updatedItem){
         return ResponseEntity.ok(cartService.updateItem(cartId, itemId, updatedItem));
     }
 

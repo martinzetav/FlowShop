@@ -1,5 +1,6 @@
 package com.microservice.checkout.exception;
 
+import com.flowshop.common.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
