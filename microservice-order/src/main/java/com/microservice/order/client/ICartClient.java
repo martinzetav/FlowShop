@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "msvc-checkout")
+@FeignClient(name = "msvc-cart")
 public interface ICartClient {
 
     @GetMapping("carts/{id}")
