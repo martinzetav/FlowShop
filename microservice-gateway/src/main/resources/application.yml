@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: msvc-gateway
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-server
+  config:
+    import: "optional:configserver:"

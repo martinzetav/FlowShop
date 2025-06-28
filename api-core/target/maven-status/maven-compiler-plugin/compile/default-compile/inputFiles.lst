@@ -1,5 +1,6 @@
 C:\Users\Lenovo\Desktop\FlowShop\api-core\src\main\java\com\flowshop\common\api\response\ApiErrorResponse.java
 C:\Users\Lenovo\Desktop\FlowShop\api-core\src\main\java\com\flowshop\common\api\response\ApiSuccessResponse.java
-C:\Users\Lenovo\Desktop\FlowShop\api-core\src\main\java\com\flowshop\common\Exception\ResourceNotFoundException.java
+C:\Users\Lenovo\Desktop\FlowShop\api-core\src\main\java\com\flowshop\common\api\response\PageResponse.java
+C:\Users\Lenovo\Desktop\FlowShop\api-core\src\main\java\com\flowshop\common\exception\ResourceNotFoundException.java
 C:\Users\Lenovo\Desktop\FlowShop\api-core\src\main\java\com\flowshop\common\Main.java
 C:\Users\Lenovo\Desktop\FlowShop\api-core\src\main\java\com\flowshop\common\util\ResponseBuilder.java

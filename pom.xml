@@ -23,6 +23,7 @@
     <module>microservice-config</module>
     <module>microservice-checkout</module>
     <module>microservice-order</module>
+    <module>microservice-gateway</module>
     <module>api-core</module>
   </modules>
 
