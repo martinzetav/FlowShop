@@ -14,4 +14,5 @@ public interface ICartService{
     void deleteCart(Long id);
     CartResponseDTO addItemToCart(Long cartId, CartItemRequestDTO newItem);
     CartResponseDTO updateItem(Long cartId, Long itemId, CartItemRequestDTO updatedItem);
+    CartResponseDTO deleteItemToCart(Long idCart, Long idItem);
 }

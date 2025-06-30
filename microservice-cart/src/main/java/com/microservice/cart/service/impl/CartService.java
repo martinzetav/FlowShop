@@ -162,4 +162,15 @@ public class CartService implements ICartService {
 
         cartRepository.deleteById(cart.getId());
     }
+
+    @Override
+    @Transactional
+    public CartResponseDTO deleteItemToCart(Long cartId, Long itemId){
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
+
+        cart.getItems().removeIf(item -> item.getId().equals(itemId));
+        cartRepository.save(cart);
+        return cartMapper.toResponseDto(cart);
+    }
 }

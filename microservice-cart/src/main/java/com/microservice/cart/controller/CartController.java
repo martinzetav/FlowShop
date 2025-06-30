@@ -80,8 +80,17 @@ public class CartController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CartResponseDTO> updateCart(@PathVariable Long id, @RequestBody CartRequestDTO cart) {
-        return ResponseEntity.ok(cartService.updateCart(id, cart));
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> updateCart(@PathVariable Long id,
+                                                                          @RequestBody @Valid CartRequestDTO cart,
+                                                                          HttpServletRequest request) {
+        CartResponseDTO updatedCart = cartService.updateCart(id, cart);
+        ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Cart updated successfully",
+                updatedCart,
+                request
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")
@@ -115,6 +124,21 @@ public class CartController {
         ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
                 HttpStatus.OK.value(),
                 "Cart product updated successfully",
+                cart,
+                request
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // elimina un item determinado
+    @PatchMapping("/{cartId}/items/{itemId}")
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> deleteItemToCart(@PathVariable Long cartId,
+                                                                                @PathVariable Long itemId,
+                                                                                HttpServletRequest request){
+        CartResponseDTO cart = cartService.deleteItemToCart(cartId, itemId);
+        ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Cart product removed successfully",
                 cart,
                 request
         );
