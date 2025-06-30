@@ -18,7 +18,10 @@ import com.microservice.cart.service.ICartService;
 import com.microservice.cart.service.IProductService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +36,8 @@ public class CartService implements ICartService {
     private final IProductService productService;
 
     @Override
-    public CartResponseDTO save(CartRequestDTO cartRequestDTO) {
+    @Transactional
+    public CartResponseDTO createCart(CartRequestDTO cartRequestDTO) {
         Optional<Cart> existingCart = cartRepository.findByUserIdAndStatus(cartRequestDTO.userId(), CartStatus.ACTIVE);
         if(existingCart.isPresent()){
             throw new UserAlreadyHasActiveCartException("The user with ID " + cartRequestDTO.userId() +
@@ -61,25 +65,21 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public List<CartResponseDTO> findAll() {
-        List<Cart> carts = cartRepository.findAll();
-        return carts.stream()
-                .map(cartMapper::toResponseDto)
-                .toList();
+    public Page<CartResponseDTO> findAllCarts(Pageable pageable) {
+        return cartRepository.findAll(pageable)
+                .map(cartMapper::toResponseDto);
     }
 
     @Override
-    public CartResponseDTO findById(Long id) {
-        Optional<Cart> cart = cartRepository.findById(id);
-        if(cart.isPresent()){
-            return cartMapper.toResponseDto(cart.get());
-        } else {
-            throw new ResourceNotFoundException("Cart with id " + id + " not found.");
-        }
+    public CartResponseDTO findCartById(Long id) {
+        Cart cart = cartRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + id + " not found."));
+
+        return cartMapper.toResponseDto(cart);
     }
 
     @Override
-    public CartResponseDTO update(Long id, CartRequestDTO cartRequestDTO) {
+    public CartResponseDTO updateCart(Long id, CartRequestDTO cartRequestDTO) {
         Cart existingCart = cartRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + id + " not found."));
 
@@ -91,6 +91,8 @@ public class CartService implements ICartService {
         return cartMapper.toResponseDto(updatedCart);
     }
 
+    @Override
+    @Transactional
     public CartResponseDTO addItemToCart(Long cartId, CartItemRequestDTO newItem) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
@@ -122,6 +124,8 @@ public class CartService implements ICartService {
         return cartMapper.toResponseDto(cartWithNewItem);
     }
 
+    @Override
+    @Transactional
     public CartResponseDTO updateItem(Long cartId, Long itemId, CartItemRequestDTO updatedItem) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
@@ -151,7 +155,8 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public void delete(Long id) {
+    @Transactional
+    public void deleteCart(Long id) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + id + " not found."));
 
