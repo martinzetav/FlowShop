@@ -59,7 +59,7 @@ public class CartService implements ICartService {
         });
 
         Cart cart = cartMapper.toEntity(cartRequestDTO);
-
+        cart.setStatus(CartStatus.ACTIVE);
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDto(savedCart);
     }
@@ -138,16 +138,23 @@ public class CartService implements ICartService {
                 .orElseThrow(() -> new ResourceNotFoundException("Item with id " + itemId + " not found in cart."));
 
         try{
-            ProductDTO product = productService.findById(existingItem.getProductId());
+            ProductDTO product = productService.findById(updatedItem.productId());
+
+            items.forEach(item -> {
+                if(item.getProductId().equals(updatedItem.productId()) && !item.getId().equals(itemId)){
+                    throw new ResourceAlreadyExistsException("Product already exists in cart.");
+                }
+            });
 
             if(updatedItem.quantity() > product.stock()){
                 throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
             }
 
+            existingItem.setProductId(updatedItem.productId());
             existingItem.setQuantity(updatedItem.quantity());
 
         } catch (FeignException.NotFound e){
-            throw new ResourceNotFoundException("Product with id " + existingItem.getProductId() + " not found.");
+            throw new ResourceNotFoundException("Product with id " + updatedItem.productId() + " not found.");
         }
 
         Cart updatedCart = cartRepository.save(cart);
@@ -169,7 +176,12 @@ public class CartService implements ICartService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
 
-        cart.getItems().removeIf(item -> item.getId().equals(itemId));
+        boolean removed = cart.getItems().removeIf(item -> item.getId().equals(itemId));
+
+        if(!removed){
+            throw new ResourceNotFoundException("Item with id " + itemId + " not found in cart.");
+        }
+
         cartRepository.save(cart);
         return cartMapper.toResponseDto(cart);
     }
