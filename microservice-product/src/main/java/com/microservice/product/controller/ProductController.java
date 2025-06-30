@@ -5,8 +5,6 @@ import com.flowshop.common.api.response.PageResponse;
 import com.flowshop.common.util.ResponseBuilder;
 import com.microservice.product.dto.request.ProductRequestDTO;
 import com.microservice.product.dto.response.ProductResponseDTO;
-import com.microservice.product.mapper.ProductMapper;
-import com.microservice.product.repository.IProductRepository;
 import com.microservice.product.service.IProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -98,15 +95,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiSuccessResponse<String>> delete(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
-        ApiSuccessResponse<String> response = ResponseBuilder.buildSuccessResponse(
-                HttpStatus.OK.value(),
-                "Product with id " + id + " successfully removed.",
-                null,
-                request
-        );
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.noContent().build();
     }
 
 
