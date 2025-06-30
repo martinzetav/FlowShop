@@ -1,6 +1,7 @@
 package com.microservice.cart.controller;
 
 import com.flowshop.common.api.response.ApiSuccessResponse;
+import com.flowshop.common.api.response.PageResponse;
 import com.flowshop.common.util.ResponseBuilder;
 import com.microservice.cart.dto.request.CartItemRequestDTO;
 import com.microservice.cart.dto.request.CartRequestDTO;
@@ -9,12 +10,13 @@ import com.microservice.cart.service.ICartService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,11 +27,11 @@ public class CartController {
 
     // Crea un carrito por primera vez.
     @PostMapping
-    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> save(@RequestBody @Valid CartRequestDTO cart,
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> createCart(@RequestBody @Valid CartRequestDTO cart,
                                                                    HttpServletRequest request,
                                                                    UriComponentsBuilder uriComponentsBuilder){
 
-        CartResponseDTO savedCart = cartService.save(cart);
+        CartResponseDTO savedCart = cartService.createCart(cart);
         var uri = uriComponentsBuilder.path("/carts/{id}").buildAndExpand(savedCart.id()).toUri();
 
         ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
@@ -43,37 +45,80 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CartResponseDTO>> findAll(){
-        return ResponseEntity.ok(cartService.findAll());
+    public ResponseEntity<ApiSuccessResponse<PageResponse<CartResponseDTO>>> findAllCarts(Pageable pageable,
+                                                                             HttpServletRequest request){
+        Page<CartResponseDTO> page = cartService.findAllCarts(pageable);
+        PageResponse<CartResponseDTO> pageResponse = new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast(),
+                page.getNumberOfElements()
+        );
+        ApiSuccessResponse<PageResponse<CartResponseDTO>> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Carts retrieved successfully",
+                pageResponse,
+                request
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CartResponseDTO> findById(@PathVariable Long id){
-        return ResponseEntity.ok(cartService.findById(id));
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> findCartById(@PathVariable Long id,
+                                                                         HttpServletRequest request){
+        CartResponseDTO cart = cartService.findCartById(id);
+        ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Cart retrieved successfully",
+                cart,
+                request
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CartResponseDTO> update(@PathVariable Long id, @RequestBody CartRequestDTO cart) {
-        return ResponseEntity.ok(cartService.update(id, cart));
+    public ResponseEntity<CartResponseDTO> updateCart(@PathVariable Long id, @RequestBody CartRequestDTO cart) {
+        return ResponseEntity.ok(cartService.updateCart(id, cart));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id){
-        cartService.delete(id);
-        return ResponseEntity.ok("Cart with id " + id + " successfully removed.");
+    public ResponseEntity<Void> deleteCart(@PathVariable Long id){
+        cartService.deleteCart(id);
+        return ResponseEntity.noContent().build();
     }
 
     // Agrega un nuevo item al carrito
     @PostMapping("/{id}/items")
-    public ResponseEntity<CartResponseDTO> addItemToCart(@PathVariable Long id, @RequestBody CartItemRequestDTO cartItem) {
-        return ResponseEntity.ok(cartService.addItemToCart(id, cartItem));
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> addItemToCart(@PathVariable Long id,
+                                                                             @RequestBody @Valid CartItemRequestDTO cartItem,
+                                                                             HttpServletRequest request) {
+        CartResponseDTO cart = cartService.addItemToCart(id, cartItem);
+        ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Product added to cart successfully",
+                cart,
+                request
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Actualiza un item determinado
     @PutMapping("/{cartId}/items/{itemId}")
-    public ResponseEntity<CartResponseDTO> updateItem(@PathVariable Long cartId, @PathVariable Long itemId,
-                                                      @RequestBody CartItemRequestDTO updatedItem){
-        return ResponseEntity.ok(cartService.updateItem(cartId, itemId, updatedItem));
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> updateItem(@PathVariable Long cartId, @PathVariable Long itemId,
+                                                      @RequestBody @Valid CartItemRequestDTO updatedItem,
+                                                      HttpServletRequest request){
+
+        CartResponseDTO cart = cartService.updateItem(cartId, itemId, updatedItem);
+        ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Cart product updated successfully",
+                cart,
+                request
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 
