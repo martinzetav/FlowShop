@@ -13,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +21,8 @@ public class ProductService implements IProductService {
     private final IProductRepository productRepository;
     private final ProductMapper productMapper;
 
-    @Transactional
     @Override
+    @Transactional
     public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
         Product product = productMapper.toEntity(productRequestDTO);
         Product savedProduct = productRepository.save(product);
@@ -39,16 +37,14 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductResponseDTO findById(Long id) {
-        Optional<Product> product = productRepository.findById(id);
-        if(product.isPresent()){
-            return productMapper.toResponseDto(product.get());
-        } else {
-            throw new ResourceNotFoundException("Product with id " + id + " not found.");
-        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found."));
+
+        return productMapper.toResponseDto(product);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO) {
         Product wantedProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found."));
@@ -62,8 +58,8 @@ public class ProductService implements IProductService {
         return productMapper.toResponseDto(updatedProduct);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void delete(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found."));
