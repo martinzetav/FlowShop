@@ -1,14 +1,18 @@
 package com.microservice.cart.controller;
 
+import com.flowshop.common.api.response.ApiSuccessResponse;
+import com.flowshop.common.util.ResponseBuilder;
 import com.microservice.cart.dto.request.CartItemRequestDTO;
 import com.microservice.cart.dto.request.CartRequestDTO;
 import com.microservice.cart.dto.response.CartResponseDTO;
 import com.microservice.cart.service.ICartService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -19,10 +23,23 @@ public class CartController {
 
     private final ICartService cartService;
 
-    // Crea un carrito por primera vez con o sin productos.
+    // Crea un carrito por primera vez.
     @PostMapping
-    public ResponseEntity<CartResponseDTO> save(@RequestBody @Valid CartRequestDTO cart){
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.save(cart));
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> save(@RequestBody @Valid CartRequestDTO cart,
+                                                                   HttpServletRequest request,
+                                                                   UriComponentsBuilder uriComponentsBuilder){
+
+        CartResponseDTO savedCart = cartService.save(cart);
+        var uri = uriComponentsBuilder.path("/carts/{id}").buildAndExpand(savedCart.id()).toUri();
+
+        ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.CREATED.value(),
+                "Cart created successfully",
+                savedCart,
+                request
+        );
+
+        return ResponseEntity.created(uri).body(response);
     }
 
     @GetMapping
