@@ -7,10 +7,12 @@ import com.microservice.cart.dto.response.CartResponseDTO;
 import com.microservice.cart.dto.ProductDTO;
 import com.microservice.cart.exception.InsufficientStockException;
 import com.microservice.cart.exception.ResourceAlreadyExistsException;
+import com.microservice.cart.exception.UserAlreadyHasActiveCartException;
 import com.microservice.cart.mapper.CartItemMapper;
 import com.microservice.cart.mapper.CartMapper;
 import com.microservice.cart.model.Cart;
 import com.microservice.cart.model.CartItem;
+import com.microservice.cart.model.CartStatus;
 import com.microservice.cart.repository.ICartRepository;
 import com.microservice.cart.service.ICartService;
 import com.microservice.cart.service.IProductService;
@@ -32,8 +34,28 @@ public class CartService implements ICartService {
 
     @Override
     public CartResponseDTO save(CartRequestDTO cartRequestDTO) {
-        // agregar validacion mediante USER_ID y verificar si tiene cart
+        Optional<Cart> existingCart = cartRepository.findByUserIdAndStatus(cartRequestDTO.userId(), CartStatus.ACTIVE);
+        if(existingCart.isPresent()){
+            throw new UserAlreadyHasActiveCartException("The user with ID " + cartRequestDTO.userId() +
+                    " already has an active shopping cart.");
+        }
+
+        cartRequestDTO.items().forEach(item -> {
+
+            try {
+                ProductDTO product = productService.findById(item.productId());
+
+                if(item.quantity() > product.stock()){
+                    throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
+                }
+
+            } catch (FeignException.NotFound e){
+                throw new ResourceNotFoundException("Product with id " + item.productId() + " not found.");
+            }
+        });
+
         Cart cart = cartMapper.toEntity(cartRequestDTO);
+
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDto(savedCart);
     }
