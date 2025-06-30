@@ -173,4 +173,15 @@ public class CartService implements ICartService {
         cartRepository.save(cart);
         return cartMapper.toResponseDto(cart);
     }
+
+    @Override
+    @Transactional
+    public CartResponseDTO clearCart(Long cartId){
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
+
+        cart.getItems().clear();
+        cartRepository.save(cart);
+        return cartMapper.toResponseDto(cart);
+    }
 }

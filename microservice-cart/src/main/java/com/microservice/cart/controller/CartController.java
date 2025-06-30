@@ -145,5 +145,18 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PutMapping("/{cartId}/items")
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> clearCart(@PathVariable Long cartId,
+                                                                         HttpServletRequest request){
+        CartResponseDTO cart = cartService.clearCart(cartId);
+        ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Cart clear successfully",
+                cart,
+                request
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 }
