@@ -16,4 +16,11 @@ public class CartService implements ICartService {
     public CartDTO findById(Long id) {
         return cartClient.getCartById(id);
     }
+
+    @Override
+    public void completeCart(Long cartId) {
+        cartClient.completeCart(cartId);
+    }
+
+
 }
