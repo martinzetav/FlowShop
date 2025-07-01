@@ -1,5 +1,6 @@
 package com.microservice.product.service.impl;
 
+import com.flowshop.common.exception.InsufficientStockException;
 import com.flowshop.common.exception.ResourceNotFoundException;
 import com.microservice.product.dto.request.ProductRequestDTO;
 import com.microservice.product.dto.response.ProductResponseDTO;
@@ -65,5 +66,19 @@ public class ProductService implements IProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found."));
 
         productRepository.deleteById(product.getId());
+    }
+
+    @Override
+    @Transactional
+    public void subtractStock(Long id, Integer quantity){
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found."));
+
+        if(product.getStock() < quantity){
+            throw new InsufficientStockException("Not enough stock available for product ID " + id);
+        }
+
+        product.setStock(product.getStock() - quantity);
+        productRepository.save(product);
     }
 }
