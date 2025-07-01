@@ -1,11 +1,11 @@
 package com.microservice.cart.service.impl;
 
+import com.flowshop.common.exception.InsufficientStockException;
 import com.flowshop.common.exception.ResourceNotFoundException;
 import com.microservice.cart.dto.request.CartItemRequestDTO;
 import com.microservice.cart.dto.request.CartRequestDTO;
 import com.microservice.cart.dto.response.CartResponseDTO;
 import com.microservice.cart.dto.ProductDTO;
-import com.microservice.cart.exception.InsufficientStockException;
 import com.microservice.cart.exception.ResourceAlreadyExistsException;
 import com.microservice.cart.exception.UserAlreadyHasActiveCartException;
 import com.microservice.cart.mapper.CartItemMapper;
