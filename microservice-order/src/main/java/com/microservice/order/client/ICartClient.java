@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "msvc-cart")
 public interface ICartClient {
 
-    @GetMapping("carts/{id}")
+    @GetMapping("/carts/internal/{id}")
     CartDTO getCartById(@PathVariable Long id);
 
 }
