@@ -131,7 +131,7 @@ public class CartController {
     }
 
     // elimina un item determinado
-    @PatchMapping("/{cartId}/items/{itemId}")
+    @DeleteMapping("/{cartId}/items/{itemId}")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> deleteItemToCart(@PathVariable Long cartId,
                                                                                 @PathVariable Long itemId,
                                                                                 HttpServletRequest request){
@@ -145,7 +145,7 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/{cartId}/items")
+    @DeleteMapping("/{cartId}/items")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> clearCart(@PathVariable Long cartId,
                                                                          HttpServletRequest request){
         CartResponseDTO cart = cartService.clearCart(cartId);
