@@ -2,6 +2,7 @@ package com.microservice.order.service.impl;
 
 import com.microservice.order.client.IProductClient;
 import com.microservice.order.dto.ProductDTO;
+import com.microservice.order.dto.StockUpdateRequest;
 import com.microservice.order.service.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,5 +16,9 @@ public class ProductService implements IProductService {
     @Override
     public ProductDTO findById(Long id) {
         return productClient.getProductById(id);
+    }
+
+    public void subtractStock(Long id, StockUpdateRequest stockUpdateRequest){
+        productClient.subtractStock(id, stockUpdateRequest);
     }
 }
