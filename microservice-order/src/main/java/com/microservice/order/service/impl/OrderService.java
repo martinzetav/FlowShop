@@ -1,10 +1,10 @@
 package com.microservice.order.service.impl;
 
+import com.flowshop.common.exception.InsufficientStockException;
+import com.flowshop.common.exception.ResourceNotFoundException;
 import com.microservice.order.dto.CartDTO;
-import com.microservice.order.dto.OrderDTO;
 import com.microservice.order.dto.ProductDTO;
-import com.microservice.order.exception.InsufficientStockException;
-import com.microservice.order.exception.ResourceNotFoundException;
+import com.microservice.order.dto.response.OrderResponseDTO;
 import com.microservice.order.mapper.OrderMapper;
 import com.microservice.order.model.Order;
 import com.microservice.order.model.OrderStatus;
@@ -16,6 +16,7 @@ import com.microservice.order.service.IProductService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,26 +33,26 @@ public class OrderService implements IOrderService {
     private final ICartService cartService;
 
     @Override
-    public OrderDTO save(Order order) {
+    public OrderResponseDTO save(Order order) {
         Order savedOrder = orderRepository.save(order);
-        return orderMapper.toDto(order);
+        return orderMapper.toResponseDto(order);
     }
 
     @Override
-    public List<OrderDTO> findAll() {
+    public List<OrderResponseDTO> findAll() {
         List<Order> orders = orderRepository.findAll();
         return orders.stream()
-                .map(orderMapper::toDto)
+                .map(orderMapper::toResponseDto)
                 .toList();
     }
 
     @Override
-    public Optional<OrderDTO> findById(Long id) {
+    public Optional<OrderResponseDTO> findById(Long id) {
         return Optional.empty();
     }
 
     @Override
-    public OrderDTO update(Long id, Order order) {
+    public OrderResponseDTO update(Long id, Order order) {
         return null;
     }
 
@@ -60,13 +61,15 @@ public class OrderService implements IOrderService {
 
     }
 
-    public OrderDTO createOrder(Long id){
+    @Override
+    @Transactional
+    public OrderResponseDTO createOrder(Long cartId){
         CartDTO cart;
 
         try{
-            cart = cartService.findById(id);
+            cart = cartService.findById(cartId);
         } catch (FeignException.NotFound e){
-            throw new ResourceNotFoundException("Cart with id " + id + " not found.");
+            throw new ResourceNotFoundException("Cart with id " + cartId + " not found.");
         }
 
         List<ProductOrder> productOrders = new ArrayList<>();
@@ -112,6 +115,6 @@ public class OrderService implements IOrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return orderMapper.toDto(savedOrder);
+        return orderMapper.toResponseDto(savedOrder);
     }
 }
