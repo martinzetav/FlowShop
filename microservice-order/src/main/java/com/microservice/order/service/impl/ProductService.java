@@ -18,6 +18,7 @@ public class ProductService implements IProductService {
         return productClient.getProductById(id);
     }
 
+    @Override
     public void subtractStock(Long id, StockUpdateRequest stockUpdateRequest){
         productClient.subtractStock(id, stockUpdateRequest);
     }
