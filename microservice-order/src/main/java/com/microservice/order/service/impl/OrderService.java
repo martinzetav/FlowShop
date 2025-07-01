@@ -4,6 +4,7 @@ import com.flowshop.common.exception.InsufficientStockException;
 import com.flowshop.common.exception.ResourceNotFoundException;
 import com.microservice.order.dto.CartDTO;
 import com.microservice.order.dto.ProductDTO;
+import com.microservice.order.dto.StockUpdateRequest;
 import com.microservice.order.dto.response.OrderResponseDTO;
 import com.microservice.order.mapper.OrderMapper;
 import com.microservice.order.model.Order;
@@ -84,11 +85,15 @@ public class OrderService implements IOrderService {
                 if(item.quantity() > product.stock()){
                     throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
                 }
+
+                productService.subtractStock(product.id(), new StockUpdateRequest(item.quantity()));
+
             } catch (FeignException.NotFound e) {
                 throw new ResourceNotFoundException("Product with id " + item.productId() + " not found.");
+            } catch (FeignException.BadRequest e){
+                throw new InsufficientStockException("Not enough stock available for product ID " + item.productId());
             }
 
-            // implementar para restar el stock del producto.
 
             ProductOrder productOrder = ProductOrder.builder()
                     .productId(product.id())
