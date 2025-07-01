@@ -1,4 +1,4 @@
-package com.microservice.cart.exception;
+package com.flowshop.common.exception;
 
 public class InsufficientStockException extends RuntimeException{
     public InsufficientStockException(String message) {

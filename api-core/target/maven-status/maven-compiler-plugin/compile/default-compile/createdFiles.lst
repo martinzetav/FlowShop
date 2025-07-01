@@ -2,5 +2,6 @@ com\flowshop\common\api\response\ApiErrorResponse.class
 com\flowshop\common\api\response\PageResponse.class
 com\flowshop\common\util\ResponseBuilder.class
 com\flowshop\common\Main.class
+com\flowshop\common\exception\InsufficientStockException.class
 com\flowshop\common\exception\ResourceNotFoundException.class
 com\flowshop\common\api\response\ApiSuccessResponse.class
