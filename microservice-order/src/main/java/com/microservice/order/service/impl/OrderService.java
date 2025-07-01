@@ -120,6 +120,8 @@ public class OrderService implements IOrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        cartService.completeCart(cart.id());
+
         return orderMapper.toResponseDto(savedOrder);
     }
 }
