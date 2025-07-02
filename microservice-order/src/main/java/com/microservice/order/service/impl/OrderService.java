@@ -78,12 +78,14 @@ public class OrderService implements IOrderService {
                     throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
                 }
 
-                productService.updateStock(product.id(), new StockUpdateRequest(item.quantity(), "ADD"));
+                productService.updateStock(product.id(), new StockUpdateRequest(item.quantity(), "SUBTRACT"));
 
             } catch (FeignException.NotFound e) {
                 throw new ResourceNotFoundException("Product with id " + item.productId() + " not found.");
             } catch (FeignException.BadRequest e){
                 throw new InvalidStockOperationException("Invalid operation value. Allowed values are ADD or SUBTRACT.");
+            } catch (FeignException.Conflict e){
+                throw new InsufficientStockException("Insufficient stock for product ID: " + item.productId());
             }
 
 
@@ -124,5 +126,26 @@ public class OrderService implements IOrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order with id " + orderId + " not found."));
         if(order.getStatus() == OrderStatus.COMPLETED) return;
         order.setStatus(OrderStatus.COMPLETED);
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with id " + orderId + " not found."));
+        if(order.getStatus() == OrderStatus.CANCELLED) return;
+        order.setStatus(OrderStatus.CANCELLED);
+        order.getOrders().forEach(productOrder -> {
+            try {
+                ProductDTO product = productService.findById(productOrder.getProductId());
+                productService.updateStock(product.id(), new StockUpdateRequest(productOrder.getQuantity(), "ADD"));
+            } catch (FeignException.NotFound e){
+                throw new ResourceNotFoundException("Product with id " + productOrder.getProductId() + " not found.");
+            } catch (FeignException.BadRequest e){
+                throw new InvalidStockOperationException("Invalid operation value. Allowed values are ADD or SUBTRACT.");
+            } catch (FeignException.Conflict e){
+                throw new InsufficientStockException("Insufficient stock for product ID: " + productOrder.getProductId());
+            }
+        });
     }
 }

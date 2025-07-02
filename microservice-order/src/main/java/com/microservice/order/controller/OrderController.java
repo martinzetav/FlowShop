@@ -104,8 +104,14 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<Void> makeOrderAsCompleted(Long id){
+    public ResponseEntity<Void> makeOrderAsCompleted(@PathVariable Long id){
         orderService.markOrderAsCompleted(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long id){
+        orderService.cancelOrder(id);
         return ResponseEntity.noContent().build();
     }
 
