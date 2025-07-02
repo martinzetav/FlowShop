@@ -11,6 +11,6 @@ public interface IProductClient {
     @GetMapping("/products/internal/{id}")
     ProductDTO getProductById(@PathVariable Long id);
 
-    @PatchMapping("/products/internal/{id}/stock")
+    @PutMapping("/products/internal/{id}/stock")
     void updateStock(@PathVariable Long id, @RequestBody StockUpdateRequest stockUpdateRequest);
 }
