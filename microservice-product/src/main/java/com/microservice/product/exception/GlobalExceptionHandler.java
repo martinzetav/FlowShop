@@ -35,12 +35,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> processInsufficientStockException(InsufficientStockException e,
                                                                               HttpServletRequest request){
         ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
                 e.getMessage(),
                 request
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(InvalidStockOperationException.class)
