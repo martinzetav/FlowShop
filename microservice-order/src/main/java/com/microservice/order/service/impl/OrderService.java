@@ -4,9 +4,11 @@ import com.flowshop.common.exception.InsufficientStockException;
 import com.flowshop.common.exception.InvalidStockOperationException;
 import com.flowshop.common.exception.ResourceNotFoundException;
 import com.microservice.order.dto.CartDTO;
+import com.microservice.order.dto.CartStatus;
 import com.microservice.order.dto.ProductDTO;
 import com.microservice.order.dto.StockUpdateRequest;
 import com.microservice.order.dto.response.OrderResponseDTO;
+import com.microservice.order.exception.InvalidCartStateException;
 import com.microservice.order.mapper.OrderMapper;
 import com.microservice.order.model.Order;
 import com.microservice.order.model.OrderStatus;
@@ -63,6 +65,10 @@ public class OrderService implements IOrderService {
             cart = cartService.findById(cartId);
         } catch (FeignException.NotFound e){
             throw new ResourceNotFoundException("Cart with id " + cartId + " not found.");
+        }
+
+        if(cart.status().equals(CartStatus.COMPLETED)){
+            throw new InvalidCartStateException("Cannot create an order for a cart that has already been completed.");
         }
 
         List<ProductOrder> productOrders = new ArrayList<>();
