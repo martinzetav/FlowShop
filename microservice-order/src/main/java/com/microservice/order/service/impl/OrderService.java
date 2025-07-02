@@ -16,6 +16,8 @@ import com.microservice.order.service.IOrderService;
 import com.microservice.order.service.IProductService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,32 +36,22 @@ public class OrderService implements IOrderService {
     private final ICartService cartService;
 
     @Override
-    public OrderResponseDTO save(Order order) {
-        Order savedOrder = orderRepository.save(order);
+    public Page<OrderResponseDTO> findAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map(orderMapper::toResponseDto);
+    }
+
+    @Override
+    public OrderResponseDTO findOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with id " + orderId + " not found."));
         return orderMapper.toResponseDto(order);
     }
 
     @Override
-    public List<OrderResponseDTO> findAll() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(orderMapper::toResponseDto)
-                .toList();
-    }
-
-    @Override
-    public Optional<OrderResponseDTO> findById(Long id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public OrderResponseDTO update(Long id, Order order) {
-        return null;
-    }
-
-    @Override
-    public void delete(Long id) {
-
+    public Page<OrderResponseDTO> findAllOrdersByUserId(Pageable pageable, Long userId){
+        return orderRepository.findAllByUserId(userId, pageable)
+                .map(orderMapper::toResponseDto);
     }
 
     @Override
@@ -123,5 +115,14 @@ public class OrderService implements IOrderService {
         cartService.completeCart(cart.id());
 
         return orderMapper.toResponseDto(savedOrder);
+    }
+
+    @Override
+    @Transactional
+    public void markOrderAsCompleted(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with id " + orderId + " not found."));
+        if(order.getStatus() == OrderStatus.COMPLETED) return;
+        order.setStatus(OrderStatus.COMPLETED);
     }
 }

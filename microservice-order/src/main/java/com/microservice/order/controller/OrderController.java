@@ -1,11 +1,16 @@
 package com.microservice.order.controller;
 
 import com.flowshop.common.api.response.ApiSuccessResponse;
+import com.flowshop.common.api.response.PageResponse;
 import com.flowshop.common.util.ResponseBuilder;
 import com.microservice.order.dto.response.OrderResponseDTO;
 import com.microservice.order.service.IOrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,5 +38,77 @@ public class OrderController {
         );
         return ResponseEntity.created(uri).body(response);
     }
+
+    @GetMapping
+    public ResponseEntity<ApiSuccessResponse<PageResponse<OrderResponseDTO>>> findAllOrders(@PageableDefault(size = 10, sort = {"date"},
+                                                                                            direction = Sort.Direction.DESC) Pageable pageable,
+                                                                                            HttpServletRequest request){
+        Page<OrderResponseDTO> page = orderService.findAllOrders(pageable);
+        PageResponse<OrderResponseDTO> pageResponse = new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast(),
+                page.getNumberOfElements()
+        );
+
+        ApiSuccessResponse<PageResponse<OrderResponseDTO>> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Orders retrieved successfully",
+                pageResponse,
+                request
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiSuccessResponse<OrderResponseDTO>> findOrderById(@PathVariable Long id,
+                                                                              HttpServletRequest request){
+        OrderResponseDTO order = orderService.findOrderById(id);
+        ApiSuccessResponse<OrderResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Order retrieved successfully",
+                order,
+                request
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<ApiSuccessResponse<PageResponse<OrderResponseDTO>>> findAllOrdersByUserId(@PageableDefault(size = 10, sort = {"date"},
+                                                                                                    direction = Sort.Direction.DESC) Pageable pageable,
+                                                                                                    @PathVariable Long id,
+                                                                                                    HttpServletRequest request){
+        Page<OrderResponseDTO> page = orderService.findAllOrdersByUserId(pageable, id);
+        PageResponse<OrderResponseDTO> pageResponse = new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast(),
+                page.getNumberOfElements()
+        );
+
+        ApiSuccessResponse<PageResponse<OrderResponseDTO>> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Orders retrieved successfully",
+                pageResponse,
+                request
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<Void> makeOrderAsCompleted(Long id){
+        orderService.markOrderAsCompleted(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 }
