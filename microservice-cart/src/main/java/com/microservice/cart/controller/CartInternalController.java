@@ -18,7 +18,7 @@ public class CartInternalController {
         return ResponseEntity.ok(cartService.findCartById(id));
     }
 
-    @PatchMapping("/{id}/complete")
+    @PutMapping("/{id}/complete")
     public ResponseEntity<Void> completeCart(@PathVariable Long id){
         cartService.completeCart(id);
         return ResponseEntity.noContent().build();
