@@ -1,6 +1,7 @@
 package com.microservice.order.service.impl;
 
 import com.flowshop.common.exception.InsufficientStockException;
+import com.flowshop.common.exception.InvalidStockOperationException;
 import com.flowshop.common.exception.ResourceNotFoundException;
 import com.microservice.order.dto.CartDTO;
 import com.microservice.order.dto.ProductDTO;
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -78,12 +78,12 @@ public class OrderService implements IOrderService {
                     throw new InsufficientStockException("Insufficient stock for product ID: " + product.id());
                 }
 
-                productService.subtractStock(product.id(), new StockUpdateRequest(item.quantity()));
+                productService.updateStock(product.id(), new StockUpdateRequest(item.quantity(), "ADD"));
 
             } catch (FeignException.NotFound e) {
                 throw new ResourceNotFoundException("Product with id " + item.productId() + " not found.");
             } catch (FeignException.BadRequest e){
-                throw new InsufficientStockException("Not enough stock available for product ID " + item.productId());
+                throw new InvalidStockOperationException("Invalid operation value. Allowed values are ADD or SUBTRACT.");
             }
 
 

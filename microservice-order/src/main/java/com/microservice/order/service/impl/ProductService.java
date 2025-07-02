@@ -19,7 +19,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void subtractStock(Long id, StockUpdateRequest stockUpdateRequest){
-        productClient.subtractStock(id, stockUpdateRequest);
+    public void updateStock(Long id, StockUpdateRequest stockUpdateRequest){
+        productClient.updateStock(id, stockUpdateRequest);
     }
 }

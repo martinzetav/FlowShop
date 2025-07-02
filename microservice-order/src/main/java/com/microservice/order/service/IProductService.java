@@ -5,6 +5,5 @@ import com.microservice.order.dto.StockUpdateRequest;
 
 public interface IProductService {
     ProductDTO findById(Long id);
-    void subtractStock(Long id, StockUpdateRequest stockUpdateRequest);
-
+    void updateStock(Long id, StockUpdateRequest stockUpdateRequest);
 }
