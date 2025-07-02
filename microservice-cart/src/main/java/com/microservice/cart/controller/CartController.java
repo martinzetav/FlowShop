@@ -79,6 +79,19 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> findActiveCartByUserId(@PathVariable Long id,
+                                                                            HttpServletRequest request){
+        CartResponseDTO cart = cartService.findActiveCartByUserId(id);
+        ApiSuccessResponse<CartResponseDTO> response = ResponseBuilder.buildSuccessResponse(
+                HttpStatus.OK.value(),
+                "Cart retrieved successfully",
+                cart,
+                request
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> updateCart(@PathVariable Long id,
                                                                           @RequestBody @Valid CartRequestDTO cart,

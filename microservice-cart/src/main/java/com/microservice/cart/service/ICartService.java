@@ -17,4 +17,5 @@ public interface ICartService{
     CartResponseDTO deleteItemToCart(Long idCart, Long idItem);
     CartResponseDTO clearCart(Long cartId);
     void completeCart(Long cartId);
+    CartResponseDTO findActiveCartByUserId(Long userId);
 }

@@ -205,4 +205,11 @@ public class CartService implements ICartService {
         if(cart.getStatus() == CartStatus.COMPLETED) return;
         cart.setStatus(CartStatus.COMPLETED);
     }
+
+    @Override
+    public CartResponseDTO findActiveCartByUserId(Long userId) {
+        Cart cart = cartRepository.findByUserIdAndStatus(userId, CartStatus.ACTIVE)
+                .orElseThrow(() -> new ResourceNotFoundException("No active cart found for user with ID " + userId));
+        return cartMapper.toResponseDto(cart);
+    }
 }
