@@ -202,8 +202,7 @@ public class CartService implements ICartService {
     public void completeCart(Long cartId){
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with id " + cartId + " not found."));
-
+        if(cart.getStatus() == CartStatus.COMPLETED) return;
         cart.setStatus(CartStatus.COMPLETED);
-        cartRepository.save(cart);
     }
 }
