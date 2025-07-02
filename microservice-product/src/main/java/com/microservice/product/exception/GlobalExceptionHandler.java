@@ -1,6 +1,7 @@
 package com.microservice.product.exception;
 
 import com.flowshop.common.exception.InsufficientStockException;
+import com.flowshop.common.exception.InvalidStockOperationException;
 import com.flowshop.common.exception.ResourceNotFoundException;
 import com.flowshop.common.api.response.ApiErrorResponse;
 import com.flowshop.common.util.ResponseBuilder;
@@ -32,6 +33,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ApiErrorResponse> processInsufficientStockException(InsufficientStockException e,
+                                                                              HttpServletRequest request){
+        ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                e.getMessage(),
+                request
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(InvalidStockOperationException.class)
+    public ResponseEntity<ApiErrorResponse> processInvalidStockOperationException(InvalidStockOperationException e,
                                                                               HttpServletRequest request){
         ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
