@@ -20,7 +20,7 @@ public class ProductInternalController {
         return ResponseEntity.ok(productService.findById(id));
     }
 
-    @PatchMapping("/{id}/stock")
+    @PutMapping("/{id}/stock")
     public ResponseEntity<Void> updateStock(@PathVariable Long id,
                                               @RequestBody @Valid StockUpdateRequest stockUpdateRequest){
         productService.updateStock(id, stockUpdateRequest);
