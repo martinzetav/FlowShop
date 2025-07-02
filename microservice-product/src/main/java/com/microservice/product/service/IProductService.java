@@ -1,6 +1,7 @@
 package com.microservice.product.service;
 
 import com.microservice.product.dto.request.ProductRequestDTO;
+import com.microservice.product.dto.request.StockUpdateRequest;
 import com.microservice.product.dto.response.ProductResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,5 +13,5 @@ public interface IProductService {
     ProductResponseDTO findById(Long id);
     ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO);
     void delete(Long id);
-    void subtractStock(Long id, Integer quantity);
+    void updateStock(Long id, StockUpdateRequest stockUpdateRequest);
 }

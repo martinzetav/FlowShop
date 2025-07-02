@@ -20,12 +20,10 @@ public class ProductInternalController {
         return ResponseEntity.ok(productService.findById(id));
     }
 
-    @PutMapping("/{id}/stock")
-    public ResponseEntity<Void> subtractStock(@PathVariable Long id,
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<Void> updateStock(@PathVariable Long id,
                                               @RequestBody @Valid StockUpdateRequest stockUpdateRequest){
-        productService.subtractStock(id, stockUpdateRequest.quantity());
+        productService.updateStock(id, stockUpdateRequest);
         return ResponseEntity.noContent().build();
     }
-
-
 }
