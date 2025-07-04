@@ -3,8 +3,10 @@ package com.microservice.order.exception;
 import com.flowshop.common.api.response.ApiErrorResponse;
 import com.flowshop.common.exception.InsufficientStockException;
 import com.flowshop.common.exception.InvalidStockOperationException;
+import com.flowshop.common.exception.ProductServiceUnavailableException;
 import com.flowshop.common.exception.ResourceNotFoundException;
 import com.flowshop.common.util.ResponseBuilder;
+import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -84,6 +87,41 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 
+    }
+
+    @ExceptionHandler(ProductServiceUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> processProductServiceUnavailableException(ProductServiceUnavailableException e,
+                                                                                      HttpServletRequest request){
+        ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
+                e.getMessage(),
+                request
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    @ExceptionHandler(CartServiceUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> processCartServiceUnavailableException(CartServiceUnavailableException e,
+                                                                                      HttpServletRequest request){
+        ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
+                e.getMessage(),
+                request
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<?> handleFeign(FeignException ex) {
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of(
+                        "status", 503,
+                        "message", "Servicio temporalmente no disponible",
+                        "timestamp", LocalDateTime.now()
+                ));
     }
 
 }
