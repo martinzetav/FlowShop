@@ -2,6 +2,7 @@ package com.microservice.cart.exception;
 
 import com.flowshop.common.api.response.ApiErrorResponse;
 import com.flowshop.common.exception.InsufficientStockException;
+import com.flowshop.common.exception.ProductServiceUnavailableException;
 import com.flowshop.common.exception.ResourceNotFoundException;
 import com.flowshop.common.util.ResponseBuilder;
 import feign.FeignException;

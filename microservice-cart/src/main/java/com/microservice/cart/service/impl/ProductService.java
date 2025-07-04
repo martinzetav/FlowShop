@@ -1,8 +1,8 @@
 package com.microservice.cart.service.impl;
 
+import com.flowshop.common.exception.ProductServiceUnavailableException;
 import com.microservice.cart.client.IProductClient;
 import com.microservice.cart.dto.ProductDTO;
-import com.microservice.cart.exception.ProductServiceUnavailableException;
 import com.microservice.cart.service.IProductService;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
