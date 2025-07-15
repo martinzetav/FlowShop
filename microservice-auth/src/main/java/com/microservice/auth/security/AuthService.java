@@ -45,7 +45,7 @@ public class AuthService {
 
     public CreateUserResponseDTO signUpUser(CreateUserRequestDTO createUserDTO){
 
-        Role role = roleRepository.findByRoleName(RoleEnum.ADMIN)
+        Role role = roleRepository.findByRoleName(RoleEnum.USER)
                 .orElseThrow(() -> new RuntimeException("El rol USER no existe en la BD"));
 
 
