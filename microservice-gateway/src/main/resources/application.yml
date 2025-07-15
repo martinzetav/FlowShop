@@ -1,17 +1,6 @@
 server:
   port: 8080
 
-security:
-  jwt:
-    key:
-      private: 5d9d4a9d3aedf28e21365e3c3bb6759ec51b6fb61ffb8543dc5a80caca3e8334
-    user:
-      generator: AUTH0JWT-BACKEND-MSVC
-
-logging:
-  level:
-    org.springframework.security: DEBUG
-
 spring:
   application:
     name: msvc-gateway
