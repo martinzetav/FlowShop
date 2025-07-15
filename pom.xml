@@ -24,6 +24,7 @@
     <module>microservice-cart</module>
     <module>microservice-order</module>
     <module>microservice-gateway</module>
+    <module>microservice-auth</module>
     <module>api-core</module>
   </modules>
 
