@@ -1,0 +1,17 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: msvc-auth
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-server
+  config:
+    import: "optional:configserver:"
+
+eureka:
+  instance:
+    hostname: localhost
