@@ -2,6 +2,7 @@ package com.microservice.cart.service.impl;
 
 import com.flowshop.common.exception.InsufficientStockException;
 import com.flowshop.common.exception.ResourceNotFoundException;
+import com.microservice.cart.dto.UserDTO;
 import com.microservice.cart.dto.request.CartItemRequestDTO;
 import com.microservice.cart.dto.request.CartRequestDTO;
 import com.microservice.cart.dto.response.CartResponseDTO;
@@ -16,6 +17,7 @@ import com.microservice.cart.model.CartStatus;
 import com.microservice.cart.repository.ICartRepository;
 import com.microservice.cart.service.ICartService;
 import com.microservice.cart.service.IProductService;
+import com.microservice.cart.service.IUserService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,6 +36,7 @@ public class CartService implements ICartService {
     private final CartItemMapper cartItemMapper;
     private final ICartRepository cartRepository;
     private final IProductService productService;
+    private final IUserService userService;
 
     @Override
     @Transactional
@@ -42,6 +45,13 @@ public class CartService implements ICartService {
         if(existingCart.isPresent()){
             throw new UserAlreadyHasActiveCartException("The user with ID " + cartRequestDTO.userId() +
                     " already has an active shopping cart.");
+        }
+
+        try{
+            UserDTO user = userService.findUserById(cartRequestDTO.userId());
+
+        } catch (FeignException.NotFound e) {
+            throw new ResourceNotFoundException("User with id " + cartRequestDTO.userId() + " not found.");
         }
 
         cartRequestDTO.items().forEach(item -> {
