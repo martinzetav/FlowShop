@@ -3,10 +3,7 @@ package com.microservice.order.service.impl;
 import com.flowshop.common.exception.InsufficientStockException;
 import com.flowshop.common.exception.InvalidStockOperationException;
 import com.flowshop.common.exception.ResourceNotFoundException;
-import com.microservice.order.dto.CartDTO;
-import com.microservice.order.dto.CartStatus;
-import com.microservice.order.dto.ProductDTO;
-import com.microservice.order.dto.StockUpdateRequest;
+import com.microservice.order.dto.*;
 import com.microservice.order.dto.response.OrderResponseDTO;
 import com.microservice.order.exception.InvalidCartStateException;
 import com.microservice.order.mapper.OrderMapper;
@@ -17,6 +14,7 @@ import com.microservice.order.repository.IOrderRepository;
 import com.microservice.order.service.ICartService;
 import com.microservice.order.service.IOrderService;
 import com.microservice.order.service.IProductService;
+import com.microservice.order.service.IUserService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,6 +34,7 @@ public class OrderService implements IOrderService {
     private final OrderMapper orderMapper;
     private final IProductService productService;
     private final ICartService cartService;
+    private final IUserService userService;
 
     @Override
     public Page<OrderResponseDTO> findAllOrders(Pageable pageable) {
@@ -52,7 +51,13 @@ public class OrderService implements IOrderService {
 
     @Override
     public Page<OrderResponseDTO> findAllOrdersByUserId(Pageable pageable, Long userId){
-        return orderRepository.findAllByUserId(userId, pageable)
+        UserDTO user;
+        try{
+            user = userService.findUserById(userId);
+        } catch (FeignException.NotFound e){
+            throw new ResourceNotFoundException("User with id " + userId + " not found.");
+        }
+        return orderRepository.findAllByUserId(user.id(), pageable)
                 .map(orderMapper::toResponseDto);
     }
 
