@@ -1,6 +1,7 @@
 package com.microservice.auth.exception;
 
 import com.flowshop.common.api.response.ApiErrorResponse;
+import com.flowshop.common.exception.ResourceNotFoundException;
 import com.flowshop.common.util.ResponseBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,20 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> processResourceNotFoundException(ResourceNotFoundException e,
+                                                                             HttpServletRequest request){
+        ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                e.getMessage(),
+                request
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> processMethodArgumentNotValidException(MethodArgumentNotValidException e,
                                                                                    HttpServletRequest request){
