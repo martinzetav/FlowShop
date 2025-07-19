@@ -4,6 +4,7 @@ import com.flowshop.common.api.response.ApiErrorResponse;
 import com.flowshop.common.exception.InsufficientStockException;
 import com.flowshop.common.exception.ProductServiceUnavailableException;
 import com.flowshop.common.exception.ResourceNotFoundException;
+import com.flowshop.common.exception.UserServiceUnavailableException;
 import com.flowshop.common.util.ResponseBuilder;
 import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -92,6 +93,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductServiceUnavailableException.class)
     public ResponseEntity<ApiErrorResponse> processProductServiceUnavailableException(ProductServiceUnavailableException e,
                                                                                      HttpServletRequest request){
+        ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
+                e.getMessage(),
+                request
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    @ExceptionHandler(UserServiceUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> processUserServiceUnavailableException(UserServiceUnavailableException e,
+                                                                                      HttpServletRequest request){
         ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
                 HttpStatus.SERVICE_UNAVAILABLE.value(),
                 HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
