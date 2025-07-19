@@ -1,10 +1,7 @@
 package com.microservice.order.exception;
 
 import com.flowshop.common.api.response.ApiErrorResponse;
-import com.flowshop.common.exception.InsufficientStockException;
-import com.flowshop.common.exception.InvalidStockOperationException;
-import com.flowshop.common.exception.ProductServiceUnavailableException;
-import com.flowshop.common.exception.ResourceNotFoundException;
+import com.flowshop.common.exception.*;
 import com.flowshop.common.util.ResponseBuilder;
 import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -103,6 +100,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CartServiceUnavailableException.class)
     public ResponseEntity<ApiErrorResponse> processCartServiceUnavailableException(CartServiceUnavailableException e,
+                                                                                      HttpServletRequest request){
+        ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
+                e.getMessage(),
+                request
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    @ExceptionHandler(UserServiceUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> UserServiceUnavailableException(UserServiceUnavailableException e,
                                                                                       HttpServletRequest request){
         ApiErrorResponse error = ResponseBuilder.buildErrorResponse(
                 HttpStatus.SERVICE_UNAVAILABLE.value(),
