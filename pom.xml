@@ -17,16 +17,7 @@
   <name>FlowShop</name>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>microservice-eureka</module>
-    <module>microservice-product</module>
-    <module>microservice-config</module>
-    <module>microservice-cart</module>
-    <module>microservice-order</module>
-    <module>microservice-gateway</module>
-    <module>microservice-auth</module>
-    <module>api-core</module>
-  </modules>
+
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
