@@ -7,6 +7,9 @@ import com.microservice.cart.dto.request.CartItemRequestDTO;
 import com.microservice.cart.dto.request.CartRequestDTO;
 import com.microservice.cart.dto.response.CartResponseDTO;
 import com.microservice.cart.service.ICartService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +28,13 @@ public class CartController {
 
     private final ICartService cartService;
 
-    // Crea un carrito por primera vez.
+    @Operation(summary = "Create a new cart", description = "Creates a new shopping cart for the user with the provided items.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Cart created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing data"),
+            @ApiResponse(responseCode = "404", description = "User or product not found"),
+            @ApiResponse(responseCode = "409", description = "User already has an active cart or product already in cart")
+    })
     @PostMapping
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> createCart(@RequestBody @Valid CartRequestDTO cart,
                                                                    HttpServletRequest request,
@@ -44,6 +53,10 @@ public class CartController {
         return ResponseEntity.created(uri).body(response);
     }
 
+    @Operation(summary = "Retrieve all carts", description = "Fetches all carts in paginated format.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Carts retrieved successfully")
+    })
     @GetMapping
     public ResponseEntity<ApiSuccessResponse<PageResponse<CartResponseDTO>>> findAllCarts(Pageable pageable,
                                                                              HttpServletRequest request){
@@ -66,6 +79,11 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get cart by ID", description = "Retrieves detailed information of a specific cart.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cart retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Cart not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> findCartById(@PathVariable Long id,
                                                                          HttpServletRequest request){
@@ -79,6 +97,11 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "Get active cart by user ID", description = "Retrieves the active cart associated with a user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cart retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No active cart found for user")
+    })
     @GetMapping("/users/{id}")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> findActiveCartByUserId(@PathVariable Long id,
                                                                             HttpServletRequest request){
@@ -92,6 +115,12 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "Update a cart", description = "Updates all details of an existing cart.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cart updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Cart not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing data")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> updateCart(@PathVariable Long id,
                                                                           @RequestBody @Valid CartRequestDTO cart,
@@ -106,13 +135,24 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "Update a cart", description = "Updates all details of an existing cart.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cart updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Cart not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing data")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCart(@PathVariable Long id){
         cartService.deleteCart(id);
         return ResponseEntity.noContent().build();
     }
 
-    // Agrega un nuevo item al carrito
+    @Operation(summary = "Add product to cart", description = "Adds a new product item to the existing cart.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product added successfully"),
+            @ApiResponse(responseCode = "404", description = "Cart or product not found"),
+            @ApiResponse(responseCode = "409", description = "Product already exists in cart or insufficient stock")
+    })
     @PostMapping("/{id}/items")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> addItemToCart(@PathVariable Long id,
                                                                              @RequestBody @Valid CartItemRequestDTO cartItem,
@@ -127,7 +167,12 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // Actualiza un item determinado
+    @Operation(summary = "Update cart item", description = "Updates quantity or product reference of a specific cart item.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cart item updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Item or cart not found"),
+            @ApiResponse(responseCode = "409", description = "Duplicate item or insufficient stock")
+    })
     @PutMapping("/{cartId}/items/{itemId}")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> updateItem(@PathVariable Long cartId, @PathVariable Long itemId,
                                                       @RequestBody @Valid CartItemRequestDTO updatedItem,
@@ -143,7 +188,11 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // elimina un item determinado
+    @Operation(summary = "Delete cart item", description = "Removes a product item from the cart.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Item removed successfully"),
+            @ApiResponse(responseCode = "404", description = "Item or cart not found")
+    })
     @DeleteMapping("/{cartId}/items/{itemId}")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> deleteItemToCart(@PathVariable Long cartId,
                                                                                 @PathVariable Long itemId,
@@ -158,6 +207,11 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "Clear cart items", description = "Removes all product items from a specific cart.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cart cleared successfully"),
+            @ApiResponse(responseCode = "404", description = "Cart not found")
+    })
     @DeleteMapping("/{cartId}/items")
     public ResponseEntity<ApiSuccessResponse<CartResponseDTO>> clearCart(@PathVariable Long cartId,
                                                                          HttpServletRequest request){
