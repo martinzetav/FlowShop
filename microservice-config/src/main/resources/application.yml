@@ -13,5 +13,6 @@ spring:
           password: ${GIT_ACCESS_TOKEN}
 
 eureka:
-  instance:
-    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://msvc-eureka-container:8761/eureka/

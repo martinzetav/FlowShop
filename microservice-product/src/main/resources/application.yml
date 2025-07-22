@@ -13,5 +13,6 @@ spring:
     import: "optional:configserver:"
 
 eureka:
-  instance:
-    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://msvc-eureka-container:8761/eureka/

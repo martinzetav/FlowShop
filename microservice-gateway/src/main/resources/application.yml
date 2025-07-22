@@ -11,3 +11,8 @@ spring:
         serviceId: config-server
   config:
     import: "optional:configserver:"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://msvc-eureka-container:8761/eureka/
